@@ -21,6 +21,15 @@ class KnowledgeBase:
             return self._cognee_error
         return "synced" if self._cognee_available else "not initialized"
 
+    @property
+    def knowledge_mode(self):
+        """Human-facing deployment status without surfacing raw import errors."""
+        if self._cognee_available and not self._cognee_error:
+            return "Cognee semantic graph synced"
+        if self.documents:
+            return "Grounded relationship graph active (Cognee optional on hosted demo)"
+        return "Ready for grounded knowledge"
+
     def initialize(self):
         try:
             import cognee  # noqa: F401 - optional runtime integration

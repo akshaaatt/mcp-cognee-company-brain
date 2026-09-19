@@ -39,7 +39,15 @@ if "knowledge" not in st.session_state:
     st.session_state.knowledge = KnowledgeBase()
 if "tools" not in st.session_state:
     st.session_state.tools = []
+if "result" not in st.session_state:
+    st.session_state.result = None
 kb = st.session_state.knowledge
+
+
+def ask(question):
+    """Store an answer so it survives Streamlit's button-triggered reruns."""
+    st.session_state.question = question
+    st.session_state.result = answer_question(kb, question)
 
 st.title("🧠 Mini Company Brain")
 st.caption("Connected, grounded company knowledge for humans and agents.")
@@ -76,8 +84,9 @@ with left:
     st.header("Knowledge")
     if st.button("Load Demo Company", type="primary"):
         kb.clear(); docs, links = load_demo(); kb.ingest(docs, links); kb.build()
+        st.session_state.result = None
         st.success("Fictional demo company loaded.")
-    st.caption(f"{len(kb.documents)} sources · {len({d.source_type for d in kb.documents})} types · Cognee: {kb.cognee_status}")
+    st.caption(f"{len(kb.documents)} sources · {len({d.source_type for d in kb.documents})} types · {kb.knowledge_mode}")
 with right:
     st.header("Upload Knowledge")
     files = st.file_uploader("Markdown, text, or JSON", type=["md", "txt", "json"], accept_multiple_files=True)
@@ -87,9 +96,24 @@ with right:
 
 st.header("Ask Your Company")
 quick = "Which customer was affected by the decision made in the January product planning meeting?"
-question = st.text_input("What do you want to know?", value=quick)
+if "question" not in st.session_state:
+    st.session_state.question = quick
+question = st.text_input("What do you want to know?", key="question")
+st.caption("Demo questions")
+first, second, third = st.columns(3)
+with first:
+    if st.button("January decision", use_container_width=True):
+        ask("What decision was made in the January product planning meeting?")
+with second:
+    if st.button("Related ticket", use_container_width=True):
+        ask("Which ticket was created by the checkout migration decision?")
+with third:
+    if st.button("Affected customer", use_container_width=True):
+        ask(quick)
 if st.button("Ask"):
-    result = answer_question(kb, question)
+    ask(question)
+result = st.session_state.result
+if result:
     st.subheader("Answer")
     st.write(result.text)
     if result.chain:
