@@ -1,0 +1,3 @@
+# Optional local Cognee semantic layer. The hosted demo uses the same grounded
+# graph and evidence flow without downloading provider/model dependencies.
+cognee==0.1.20

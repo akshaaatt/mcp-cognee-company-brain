@@ -28,6 +28,9 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
+To enable the optional local Cognee semantic pipeline where its compatible
+dependencies are available, additionally run `pip install -r requirements-cognee.txt`.
+
 Click **Load Demo Company**, then ask: “Which customer was affected by the decision made in the January product planning meeting?”
 
 ## MCP
